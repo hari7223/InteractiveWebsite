@@ -21,6 +21,9 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+def get_s3_bucket():
+    return os.environ.get("S3_BUCKET")
+
 
 def init_db():
     conn = get_db()
@@ -51,6 +54,9 @@ init_db()
 def index():
     return render_template('home.html')
 
+@app.route('/debug-env')
+def debug_env():
+    return render_template('debug_env.html', env=os.environ.get("S3_BUCKET", "Not Set"), region=AWS_REGION)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -84,10 +90,12 @@ def register():
 
         s3_key = f"{S3_PREFIX}/{username}/{safe_name}"
         s3_client = boto3.client("s3", region_name=AWS_REGION)
-        s3_client.upload_fileobj(file, S3_BUCKET, s3_key)
+
+        bucket = get_s3_bucket()
+        s3_client.upload_fileobj(file, bucket, s3_key)
 
         file_name = safe_name
-        s3_bucket = S3_BUCKET
+        s3_bucket = bucket
 
     conn = get_db()
     c = conn.cursor()

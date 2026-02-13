@@ -8,10 +8,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-S3_BUCKET = os.environ.get("S3_BUCKET")
-AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
-S3_PREFIX = os.environ.get("S3_PREFIX", "uploads")
-S3_URL_EXPIRES = int(os.environ.get("S3_URL_EXPIRES", "300"))
+
 
 DB_PATH = os.path.join(BASE_DIR, "users.db")
 
@@ -21,9 +18,25 @@ def get_db():
     conn.row_factory = sqlite3.Row
     return conn
 
-def get_s3_bucket():
-    return os.environ.get("S3_BUCKET")
+def get_env(name, default=None):
+    return os.environ.get(name, default)
 
+def s3_bucket():
+    return get_env("S3_BUCKET", "users-wordcount")
+
+def aws_region():
+    return get_env("AWS_REGION", "us-east-1")
+
+def s3_prefix():
+    return get_env("S3_PREFIX", "uploads")
+
+def s3_url_expires():
+    return int(get_env("S3_URL_EXPIRES", "300"))
+
+S3_BUCKET = s3_bucket()
+AWS_REGION = aws_region()
+S3_PREFIX = s3_prefix()
+S3_URL_EXPIRES = s3_url_expires()
 
 def init_db():
     conn = get_db()
@@ -91,7 +104,7 @@ def register():
         s3_key = f"{S3_PREFIX}/{username}/{safe_name}"
         s3_client = boto3.client("s3", region_name=AWS_REGION)
 
-        bucket = get_s3_bucket()
+        bucket = S3_BUCKET
         s3_client.upload_fileobj(file, bucket, s3_key)
 
         file_name = safe_name

@@ -56,7 +56,7 @@ def index():
 
 @app.route('/debug-env')
 def debug_env():
-    return render_template('debug_env.html', env=os.environ.get("S3_BUCKET", "Not Set"), region=AWS_REGION)
+    return f"S3_BUCKET={S3_BUCKET}"
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

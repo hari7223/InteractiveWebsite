@@ -10,7 +10,7 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", "dev-secret")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
-DB_PATH = os.path.join(BASE_DIR, "users.db")
+DB_PATH = "/var/www/data/users.db"
 
 
 def get_db():

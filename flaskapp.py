@@ -125,8 +125,9 @@ def register():
     )
     conn.commit()
     conn.close()
-
-    return redirect(url_for('index'))
+    
+    session['username'] = username
+    return redirect(url_for('profile'))
 
 
 @app.route('/signin', methods=['POST'])
